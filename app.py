@@ -1,3 +1,4 @@
+%%writefile app.py
 
 import pandas as pd
 import plotly.express as px
@@ -8,10 +9,14 @@ import statsmodels as sm
 df= pd.read_csv('energy_clean.csv')
 
 st.set_page_config(page_title='Energy',layout='wide')
-st.title('Energy Dashboard')
+
+st.title('Global Energy Trends')
 
 
-# Year and Country Filters
+
+
+
+#  Filters
 
 st.sidebar.header('Filters')
 
@@ -32,29 +37,29 @@ if selected_country:
     filtered_df = filtered_df[
     (filtered_df['country']==(selected_country))]
     filtered_df=filtered_df[(filtered_df['year'].between(year_filter[0], year_filter[1]))]
-
-
+                        
+                       
     st.dataframe(filtered_df)
 
 # Dividing the Webage into Multiple parts
 
-page=st.radio('choose an option',['Navigate','Analysis'])
+page=st.sidebar.radio('Navigate',['Overview','Analysis'])
 
+if page == 'Navigate':
+    st.success('''This project studies energy generation over time and examines its relationship with: electricity generation , economic development (GDP and income), and energy access (individual share of energy and energy per GDP)
 
-if page=='Navigate':
-    st.subheader('Data General View')
-
+key Questions: Has renewable energy generation increased over time? Does higher renewable energy lead to or correlate with higher total electricity generation? Is renewable energy associated with more energy access ? Is renewable energy associated with higher GDP ? Which renewable source (solar, wind, hydro,biofuel) contributes the most to growth? Does increasing renewable energy reduce relying on non-renewable energy ?''')
 
 elif page=='Analysis':
-
-
+    
+    
 
     tab1,tab2,tab3,tab4,tab5,tab6,tab7=st.tabs(['Overview','Renewable Energy Over Time','Income-based Analysis',
     'Renewable Energy VS. Electricity','Renewable Energy by Continent','Energy Matrix','Summary'])
 
     with tab1:
-
-        st.subheader('General KPIs')
+    
+        
         col1,col2=st.columns(2,gap='large')
         col3,col4=st.columns(2,gap='large')
         col5,col7=st.columns(2,gap='large')
@@ -91,34 +96,34 @@ elif page=='Analysis':
         col8,col9,col10=st.columns(3,gap='large')
         col11,col12=st.columns(2,gap='large')
 
-
+        
         df1=df.groupby('year')[['solar_electricity', 'wind_electricity',
                             'biofuel_electricity','hydro_electricity',
                             'renewables_electricity']].sum().reset_index()
 
         with col8:
 
-            fig1 = px.line(df1,y='renewables_electricity',x='year')
+            fig1 = px.line(df1,y='renewables_electricity',x='year',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig1,use_container_width=True)
 
         with col9:
-            fig2=px.line(df1,y='solar_electricity',x='year')
+            fig2=px.line(df1,y='solar_electricity',x='year',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig2,use_container_width=True)
 
         with col10:
-            fig3=px.line(df1,y='hydro_electricity',x='year')
+            fig3=px.line(df1,y='hydro_electricity',x='year',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig3,use_container_width=True)
-
+            
 
         with col11:
-            fig4=px.line(df1,y='wind_electricity',x='year')
+            fig4=px.line(df1,y='wind_electricity',x='year',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig4,use_container_width=True)
-
+            
         with col12:
-            fig5=px.line(df1,y='biofuel_electricity',x='year')
+            fig5=px.line(df1,y='biofuel_electricity',x='year',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig5,use_container_width=True)
 
-        st.markdown('All kinds of renewable energy have generally increased over time')
+        st.info('All kinds of renewable energy have generally increased over time')
 
 
 #######################################################################################################
@@ -128,79 +133,79 @@ elif page=='Analysis':
                         (df['country'] =='Lower-middle-income countries' )|
                         (df['country'] =='Upper-middle-income countries' )|
                         (df['country'] == 'High-income countries')]
-
+        
 
         col13,col14,col15=st.columns(3,gap='large')
         col16,col17=st.columns(2,gap='large')
         col18,col19=st.columns(2,gap='large')
 
         with col13:
-            fig6=px.bar(income,y='renewables_electricity',x='country')
+            fig6=px.bar(income,y='renewables_electricity',x='country',color_discrete_sequence=['slateblue'])
             st.plotly_chart(fig6,use_container_width=True)
 
 
         with col14:
-            fig7=px.bar(income,y='solar_electricity',x='country')
+            fig7=px.bar(income,y='solar_electricity',x='country',color_discrete_sequence=['slateblue'])
             st.plotly_chart(fig7,use_container_width=True)
 
 
         with col15:
-            fig8=px.bar(income,y='wind_electricity',x='country')
+            fig8=px.bar(income,y='wind_electricity',x='country',color_discrete_sequence=['slateblue'])
             st.plotly_chart(fig8,use_container_width=True)
 
 
         with col16:
-            fig9=px.bar(income,y='hydro_electricity',x='country')
+            fig9=px.bar(income,y='hydro_electricity',x='country',color_discrete_sequence=['slateblue'])
             st.plotly_chart(fig9,use_container_width=True)
 
         with col17:
-            fig10=px.bar(income,y='biofuel_electricity',x='country')
+            fig10=px.bar(income,y='biofuel_electricity',x='country',color_discrete_sequence=['slateblue'])
             st.plotly_chart(fig10,use_container_width=True)
 
-        st.markdown('High-income countries produce more renewable energy than low and middle-income countries')
-        st.markdown('Hydro power and wind energy are the top two kinds of renewable energy adapted in high-income and upper-middle-income countries')
+        st.info('High-income countries produce more renewable energy than low and middle-income countries')
+        st.info('Hydro power and wind energy are the top two kinds of renewable energy adapted in high-income and upper-middle-income countries')
 ############################################################################################################################
     with tab4:
-
+       
         st.subheader('Renewable Energy VS. Electricity Generation')
 
         col20,col21,col22=st.columns(3,gap='large')
         col23,col24=st.columns(2,gap='large')
-
+        
 
         with col20:                
-            fig13= px.scatter(df,x='electricity_generation',y='solar_electricity',
+            fig13= px.scatter(df,x='electricity_generation',y='solar_electricity',color_discrete_sequence=['skyblue'],
                    trendline='ols')
             st.plotly_chart(fig13,use_container_width=True)
 
         with col21:                
-            fig14= px.scatter(df,x='electricity_generation',y='wind_electricity',
+            fig14= px.scatter(df,x='electricity_generation',y='wind_electricity',color_discrete_sequence=['skyblue'],
                    trendline='ols')
             st.plotly_chart(fig14,use_container_width=True)
-
+        
         with col22:                
-            fig15= px.scatter(df,x='electricity_generation',y='renewables_electricity',
+            fig15= px.scatter(df,x='electricity_generation',y='renewables_electricity',color_discrete_sequence=['skyblue'],
                    trendline='ols')
             st.plotly_chart(fig15,use_container_width=True)
-
+        
         with col23:                
-            fig16= px.scatter(df,x='electricity_generation',y='hydro_electricity',
+            fig16= px.scatter(df,x='electricity_generation',y='hydro_electricity',color_discrete_sequence=['skyblue'],
                    trendline='ols')
             st.plotly_chart(fig16,use_container_width=True)
 
         with col24:                
-            fig17= px.scatter(df,x='electricity_generation',y='biofuel_electricity',
+            fig17= px.scatter(df,x='electricity_generation',y='biofuel_electricity',color_discrete_sequence=['skyblue'],
                    trendline='ols')
             st.plotly_chart(fig17,use_container_width=True)
 
-        st.markdown('All kinds of renewable energy resources correlates positively with total electricity generation (increased generation)')
-        st.markdown('Hydro power has the strongest correlation and the most stable growth')               
+        st.info('All kinds of renewable energy resources correlates positively with total electricity generation (increased generation)')
+        st.info('Hydro power has the strongest correlation and the most stable growth')               
 ##############################################################################################################################
     with tab5:
 
         col25,col26,col27=st.columns(3,gap='large')
         col28,col29=st.columns(2,gap='large')
-
+     
         continent = df[(df['country'] == 'Africa')|
                       (df['country'] =='Australia')|
                       (df['country'] == 'Asia')|
@@ -210,46 +215,46 @@ elif page=='Analysis':
                       ] 
 
         with col25:
-            fig18=px.bar(continent,y='renewables_electricity',x='country')
+            fig18=px.bar(continent,y='renewables_electricity',x='country',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig18,use_container_width=True)
 
         with col26:
-            fig19=px.bar(continent,y='solar_electricity',x='country')
+            fig19=px.bar(continent,y='solar_electricity',x='country',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig19,use_container_width=True)
 
-
+           
 
         with col27:
-            fig20=px.bar(continent,y='wind_electricity',x='country')
+            fig20=px.bar(continent,y='wind_electricity',x='country',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig20,use_container_width=True)
 
 
 
         with col28:
-            fig21=px.bar(continent,y='biofuel_electricity',x='country')
+            fig21=px.bar(continent,y='biofuel_electricity',x='country',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig21,use_container_width=True)
 
-
+          
         with col29:
-            fig22=px.bar(continent,y='hydro_electricity',x='country')
+            fig22=px.bar(continent,y='hydro_electricity',x='country',color_discrete_sequence=['dodgerblue'])
             st.plotly_chart(fig22,use_container_width=True)
 
-
-
+            
+    
 ######################################################################################################
     with tab6:
-
+       
         st.subheader('renewable energy VS. energy access indicators')
-
+        
         corr_matrix = px.imshow(df[[
                             'electricity_generation','total_energy_per_capita','energy_per_gdp',
                             'hydro_electricity', 'biofuel_electricity','solar_electricity', 
                             'wind_electricity','renewables_electricity'
                             ]].corr(),text_auto = True,color_continuous_scale=px.colors.sequential.Blues_r)
-
+                            
         st.plotly_chart(corr_matrix,use_container_width=True)
-
-        st.markdown("""Renewable energy has a weak relationship with the individual share of energy and energy_per_gdp, 
+   
+        st.info("""Renewable energy has a weak relationship with the individual share of energy and energy_per_gdp, 
         but correlates positively with electricity generation""")
 ######################################################################################################
     with tab7:
@@ -257,7 +262,7 @@ elif page=='Analysis':
         # Main Conclusion
 
         Global Renewable Energy Trends:
-
+        
         All kinds of renewable energy have generally increased over time, with 
         accelerated growth after 2000. Wind energy and Hydropower are the dominant 
         resources that have grown more rapidly than other renewables.
@@ -271,11 +276,12 @@ elif page=='Analysis':
         strong positive correlation with total electricity generation.**
         """)
 
-
+    
         st.markdown("""
         Economic Impact:        
             Higher-income countries generally adopt renewable energy 
             than lower-income countries.
         """)
-
-
+                    
+        
+      
